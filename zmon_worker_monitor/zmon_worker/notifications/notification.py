@@ -56,7 +56,7 @@ class BaseNotification(object):
         name = to_utf8(name)
         try:
             replacements = {'entities': alert['entity']['id']}
-            replacements.update(alert['captures'])
+            replacements.update(to_utf8(alert['captures']))
             return name.format(**replacements)
         except KeyError as e:
             return name  # This is fairly normal. Just use the unformatted name.
