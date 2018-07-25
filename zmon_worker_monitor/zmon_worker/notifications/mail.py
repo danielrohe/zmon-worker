@@ -84,7 +84,7 @@ class Mail(BaseNotification):
 
         try:
             tmpl = jinja_env.get_template('alert.txt')
-            body_plain = tmpl.render(expanded_alert_name=expanded_alert_name,
+            body_plain = tmpl.render(expanded_alert_name=cls.to_utf8(expanded_alert_name),
                                      include_value=include_value,
                                      include_definition=include_definition,
                                      include_captures=include_captures,
