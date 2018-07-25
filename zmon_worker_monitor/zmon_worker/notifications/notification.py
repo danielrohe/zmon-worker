@@ -53,7 +53,7 @@ class BaseNotification(object):
     @classmethod
     def _get_expanded_alert_name(cls, alert, custom_message=None):
         name = (alert['alert_def']['name'] if not custom_message else custom_message)
-        name = name.encode('utf8')
+        name = to_utf8(name)
         try:
             replacements = {'entities': alert['entity']['id']}
             replacements.update(alert['captures'])
@@ -94,3 +94,9 @@ class BaseNotification(object):
 
         logging.info("Redirect notifications: from %s to %s", targets, new_targets)
         return new_targets
+
+
+def to_utf8(s):
+    if type(s) is unicode:
+        return s.encode('utf-8')
+    return s
