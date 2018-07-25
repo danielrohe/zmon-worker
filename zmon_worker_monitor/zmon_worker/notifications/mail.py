@@ -78,9 +78,9 @@ class Mail(BaseNotification):
         zmon_host = kwargs.get('zmon_host', cls._config.get('zmon.host'))
         alert_url = urlparse.urljoin(zmon_host, '/#/alert-details/{}'.format(alert_def['id'])) if zmon_host else ''
 
-        for name, val in alert.get('captures', {}):
-            if type(val) in [str, unicode]:
-                alert['captures'][name] = cls.to_utf8(val)
+        for cap_name, cap_val in alert.get('captures', {}).iteritems():
+            if type(cap_val) in [str, unicode]:
+                alert['captures'][cap_name] = cls.to_utf8(cap_val)
 
         try:
             tmpl = jinja_env.get_template('alert.txt')

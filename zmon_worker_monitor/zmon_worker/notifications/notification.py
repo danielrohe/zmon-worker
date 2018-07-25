@@ -54,9 +54,9 @@ class BaseNotification(object):
     def _get_expanded_alert_name(cls, alert, custom_message=None):
         name = (alert['alert_def']['name'] if not custom_message else custom_message)
         name = cls.to_utf8(name)
-        for name, val in alert.get('captures', {}):
-            if type(val) in [str, unicode]:
-                alert['captures'][name] = cls.to_utf8(val)
+        for cap_name, cap_val in alert.get('captures', {}).iteritems():
+            if type(cap_val) in [str, unicode]:
+                alert['captures'][cap_name] = cls.to_utf8(cap_val)
 
         try:
             replacements = {'entities': alert['entity']['id']}
