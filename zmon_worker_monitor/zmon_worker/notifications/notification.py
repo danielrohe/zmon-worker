@@ -53,10 +53,14 @@ class BaseNotification(object):
     @classmethod
     def _get_expanded_alert_name(cls, alert, custom_message=None):
         name = (alert['alert_def']['name'] if not custom_message else custom_message)
-        name = to_utf8(name)
+        name = cls.to_utf8(name)
+        for name, val in alert.get('captures', {}):
+            if type(val) in [str, unicode]:
+                alert['captures'][name] = cls.to_utf8(val)
+
         try:
             replacements = {'entities': alert['entity']['id']}
-            replacements.update(to_utf8(alert['captures']))
+            replacements.update(alert['captures'])
             return name.format(**replacements)
         except KeyError as e:
             return name  # This is fairly normal. Just use the unformatted name.
@@ -95,8 +99,8 @@ class BaseNotification(object):
         logging.info("Redirect notifications: from %s to %s", targets, new_targets)
         return new_targets
 
-
-def to_utf8(s):
-    if type(s) is unicode:
-        return s.encode('utf-8')
-    return s
+    @classmethod
+    def to_utf8(cls, s):
+        if type(s) is unicode:
+            return s.encode('utf-8')
+        return s
