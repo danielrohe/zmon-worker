@@ -297,6 +297,24 @@ class HttpWrapper(object):
 
         return samples_by_name
 
+    def prometheus_flat(self):
+        t = prometheus(self)
+        result = {}
+        for key, value in t.items():
+            if len(val) == 1 and len(val[0][0]) == 0:
+                result[key] = val[0][1]
+            else:
+                metrics = {}
+                for v in val:
+                    labels, value = v[0], v[1]
+                    labels_key_list = []
+                    for k in sorted(labels):
+                        labels_key_list.append(k)
+                        labels_key_list.append(labels[k])
+                    metrics['.'.join(labels_key_list)] = value
+                result[key] = metrics
+        return result
+
     def headers(self, raise_error=True):
         return dict(self.__request(raise_error=raise_error).headers)
 
