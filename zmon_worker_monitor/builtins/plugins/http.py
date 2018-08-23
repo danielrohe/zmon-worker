@@ -298,21 +298,27 @@ class HttpWrapper(object):
         return samples_by_name
 
     def prometheus_flat(self):
-        t = prometheus(self)
+        t = self.__request().text
         result = {}
-        for key, value in t.items():
-            if len(val) == 1 and len(val[0][0]) == 0:
-                result[key] = val[0][1]
-            else:
-                metrics = {}
-                for v in val:
-                    labels, value = v[0], v[1]
+        for prom_family in text_string_to_metric_families(t):
+            # prom_family.name - name
+            # prom_family.type - type (gauge, summary, ...)
+            # prom_family.samples - samples
+            for prom_sample in prom_family.samples:
+                # prom_sample[0] = name
+                # prom_sample[1] = labels dict (label name -> label value)
+                # prom_sample[2] = value
+                if len(prom_sample[1]) == 0:
+                    # no labels
+                    result[prom_sample[0]] = prom_sample[2]
+                else:
+                    metrics = result.setdefault(prom_sample[0], {})
                     labels_key_list = []
-                    for k in sorted(labels):
-                        labels_key_list.append(k)
-                        labels_key_list.append(labels[k])
-                    metrics['.'.join(labels_key_list)] = value
-                result[key] = metrics
+                    for label in sorted(prom_sample[1]):
+                        labels_key_list.append(label)
+                        labels_key_list.append(prom_sample[1][label])
+                    key = '.'.join(labels_key_list)
+                    metrics[key] = prom_sample[2]
         return result
 
     def headers(self, raise_error=True):
