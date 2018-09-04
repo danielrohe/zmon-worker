@@ -459,7 +459,10 @@ processors 8.0
             u'exception.None.method.GET.status.200.uri./api/hello': 0.103182669
         }
     }
-    assert expected == http.prometheus_flat([u'httpsessions_max',u'http_server_requests_seconds_sum.exception.None.method.GET.status.200.uri./api/hello'])
+    assert expected == http.prometheus_flat([
+        u'httpsessions_max',
+        u'http_server_requests_seconds_sum.exception.None.method.GET.status.200.uri./api/hello'
+    ])
 
 
 @pytest.mark.parametrize('url,port,err', (

@@ -297,7 +297,7 @@ class HttpWrapper(object):
 
         return samples_by_name
 
-    def prometheus_flat(self, include_keys = []):
+    def prometheus_flat(self, include_keys=[]):
         t = self.__request().text
         result = {}
         for prom_family in text_string_to_metric_families(t):
