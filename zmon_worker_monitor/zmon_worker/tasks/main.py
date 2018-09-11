@@ -16,7 +16,9 @@ import time
 import urllib
 from urllib3.util import parse_url
 import math
-
+from base64 import b64decode
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
 
 from bisect import bisect_left
 from collections import Callable, Counter
@@ -47,6 +49,7 @@ from zmon_worker_monitor.zmon_worker.errors import (
     CheckError, AlertError, InsufficientPermissionsError, SecurityError, ResultSizeError)
 from zmon_worker_monitor.zmon_worker.notifications.http import NotifyHttp
 from zmon_worker_monitor.zmon_worker.notifications.hipchat import NotifyHipchat
+from zmon_worker_monitor.zmon_worker.notifications.google_hangouts_chat import NotifyGoogleHangoutsChat
 from zmon_worker_monitor.zmon_worker.notifications.hubot import Hubot
 from zmon_worker_monitor.zmon_worker.notifications.mail import Mail
 from zmon_worker_monitor.zmon_worker.notifications.notification import BaseNotification
@@ -518,6 +521,7 @@ def _build_notify_context(alert):
         'notify_sms': functools.partial(Sms.notify, alert),
         'notify_hubot': functools.partial(Hubot.notify, alert),
         'send_hipchat': functools.partial(NotifyHipchat.notify, alert),
+        'send_google_hangouts_chat': functools.partial(NotifyGoogleHangoutsChat.notify, alert),
         'notify_hipchat': functools.partial(NotifyHipchat.notify, alert),
         'send_slack': functools.partial(NotifySlack.notify, alert),
         'notify_slack': functools.partial(NotifySlack.notify, alert),
@@ -662,6 +666,12 @@ def jsonpath_flat_filter(obj, path):
     return dict([(str(m.full_path), m.value) for m in match])
 
 
+def parse_cert(s, base64=True):
+    if base64:
+        s = b64decode(s)
+    return x509.load_pem_x509_certificate(s, default_backend())
+
+
 def build_default_context():
     return {
         'abs': abs,
@@ -702,6 +712,7 @@ def build_default_context():
         'normalvariate': random.normalvariate,
         'oct': oct,
         'ord': ord,
+        'parse_cert': parse_cert,
         'percentile': mathfun.percentile,
         'pow': pow,
         'range': range,

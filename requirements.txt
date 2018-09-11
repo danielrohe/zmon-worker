@@ -1,6 +1,7 @@
 boto3>=1.4.3
 bs4
 cassandra-driver>=3.12.0
+cryptography
 dnspython
 dogpile.cache
 eventlog-writer==0.4.5
@@ -33,5 +34,5 @@ setproctitle
 stups-tokens>=1.0.14
 subprocess32
 timeperiod2==0.1
-Yapsy>=1.10.423
+Yapsy==1.11.223
 
