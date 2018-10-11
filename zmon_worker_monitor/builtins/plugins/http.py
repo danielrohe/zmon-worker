@@ -287,7 +287,10 @@ class HttpWrapper(object):
         r = self.__request(raise_error=raise_error)
         return r.text
 
-    def prometheus(self):
+    def prometheus(self, flat=False):
+        if flat:
+            return self.prometheus_flat()
+
         t = self.__request().text
         samples_by_name = defaultdict(list)
 
@@ -311,7 +314,7 @@ class HttpWrapper(object):
 
                 if len(prom_sample[1]) == 0:
                     # no labels
-                    if len(include_keys) == 0 or prom_sample[0] in include_keys:
+                    if include_keys is None or len(include_keys) == 0 or prom_sample[0] in include_keys:
                         result[prom_sample[0]] = prom_sample[2]
                 else:
                     labels_key_list = []
@@ -321,7 +324,7 @@ class HttpWrapper(object):
                     key = '.'.join(labels_key_list)
 
                     full_name = '%s.%s' % (prom_sample[0], key)
-                    if len(include_keys) == 0 or full_name in include_keys:
+                    if include_keys is None or len(include_keys) == 0 or full_name in include_keys:
                         metrics = result.setdefault(prom_sample[0], {})
                         metrics[key] = prom_sample[2]
         return result
